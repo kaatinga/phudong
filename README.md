@@ -78,6 +78,7 @@ type Logger interface {
 You can use your own logger by implementing this interface and passing it via `WithLogger`.
 
 ## License
-MIT
+
+This project is licensed under the [MIT License](LICENSE).
 
 
