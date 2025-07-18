@@ -8,14 +8,12 @@ import (
 
 type Worker struct {
 	waitFunc func()
-	name     string
 
 	options
 }
 
-func NewWorker(name string, opts ...optionFunc) *Worker {
+func NewWorker(opts ...optionFunc) *Worker {
 	return &Worker{
-		name:    name,
 		options: newOptions(opts...),
 	}
 }
