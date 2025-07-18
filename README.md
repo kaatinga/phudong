@@ -1,8 +1,9 @@
 # phudong
 
-A simple, idiomatic Go worker helper to get rid of boilerplate code for periodic or background jobs. 
+A simple, idiomatic Go worker helper to get rid of boilerplate code for periodic or background jobs.
 
 ## Features
+
 - Minimal, flexible API
 - Functional options for configuration
 - Context-aware worker lifecycle
@@ -56,6 +57,7 @@ func main() {
 ```
 
 ## Configuration Options
+
 - `WithName(name string)` — Set the worker's name
 - `WithDuration(d time.Duration)` — Set how often the worker runs (default: 1 hour)
 - `WithInstantRun(enabled bool)` — Run immediately on start
@@ -65,12 +67,13 @@ func main() {
 - `WithLogger(qlog.Logger)` — Inject a custom logger (see below)
 
 ## Logger Interface
+
 phudong uses a minimal logger interface compatible with [qlog](https://github.com/kaatinga/qlog):
 
 ```go
 type Logger interface {
-    Printf(format string, args ...any)
-	Errorf(format string, args ...any)
+Printf(format string, args ...any)
+Errorf(format string, args ...any)
 }
 ```
 
