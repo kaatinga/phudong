@@ -56,8 +56,8 @@ func (w *Worker) Start(ctx context.Context) {
 	}
 
 	go func() {
-		w.logger.Debugf(w.name + " started")
-		defer w.logger.Debugf(w.name + " stopped")
+		w.logger.Printf(w.name + " started")
+		defer w.logger.Printf(w.name + " stopped")
 		defer wg.Done()
 		defer ticker.Stop()
 
