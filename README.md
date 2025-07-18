@@ -36,12 +36,11 @@ import (
 func main() {
 	logger := qlog.New()
 	worker := phudong.NewWorker(
-		"example-worker",
 		phudong.WithDuration(2*time.Second),
 		phudong.WithInstantRun(true),
 		phudong.WithLogger(logger),
 		phudong.WithDoThis(func(ctx context.Context) {
-			logger.Debugf("tick at %v", time.Now())
+			logger.Printf("tick at %v", time.Now())
 		}),
 		phudong.WithErrorProcessor(func(ctx context.Context, err error) {
 			logger.Errorf("worker error: %v", err)
@@ -70,7 +69,7 @@ phudong uses a minimal logger interface compatible with [qlog](https://github.co
 
 ```go
 type Logger interface {
-	Debugf(format string, args ...any)
+    Printf(format string, args ...any)
 	Errorf(format string, args ...any)
 }
 ```
@@ -80,5 +79,3 @@ You can use your own logger by implementing this interface and passing it via `W
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-
