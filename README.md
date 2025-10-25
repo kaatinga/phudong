@@ -1,13 +1,12 @@
 [![Go CI](https://github.com/kaatinga/phudong/actions/workflows/golang_ci.yml/badge.svg)](https://github.com/kaatinga/phudong/actions/workflows/golang_ci.yml)
 [![CodeQL](https://github.com/kaatinga/phudong/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/kaatinga/phudong/actions/workflows/github-code-scanning/codeql)
 [![codecov](https://codecov.io/gh/kaatinga/phudong/graph/badge.svg?token=VKIKGVHK6S)](https://codecov.io/gh/kaatinga/phudong)
+[![Go Reference](https://pkg.go.dev/badge/github.com/kaatinga/phudong.svg)](https://pkg.go.dev/github.com/kaatinga/phudong)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kaatinga/phudong)](https://goreportcard.com/report/github.com/kaatinga/phudong)
 
 # phudong
 
 A simple, idiomatic Go worker helper to get rid of boilerplate code for periodic or background jobs.
-
-[![Go Reference](https://pkg.go.dev/badge/github.com/kaatinga/phudong.svg)](https://pkg.go.dev/github.com/kaatinga/phudong)
-[![Go Report Card](https://goreportcard.com/badge/github.com/kaatinga/phudong)](https://goreportcard.com/report/github.com/kaatinga/phudong)
 
 ## Name origin
 
