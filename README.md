@@ -1,5 +1,6 @@
 [![Go CI](https://github.com/kaatinga/phudong/actions/workflows/golang_ci.yml/badge.svg)](https://github.com/kaatinga/phudong/actions/workflows/golang_ci.yml)
 [![CodeQL](https://github.com/kaatinga/phudong/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/kaatinga/phudong/actions/workflows/github-code-scanning/codeql)
+[![codecov](https://codecov.io/gh/kaatinga/phudong/graph/badge.svg?token=VKIKGVHK6S)](https://codecov.io/gh/kaatinga/phudong)
 
 # phudong
 
