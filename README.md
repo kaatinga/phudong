@@ -271,6 +271,7 @@ func TestMyWorker(t *testing.T) {
 3. **Use meaningful names** - Set worker names for better logging
 4. **Test your workers** - Include tests for your worker functions
 5. **Consider instant run** - Use `WithInstantRun(true)` for immediate execution
+6. **Set logger first** - If you want to use a custom logger, set it first, so all the messages are logged using it.
 
 ## License
 
