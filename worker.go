@@ -38,26 +38,26 @@ func (w *Worker) Start(ctx context.Context) {
 	}
 
 	doThisWrapper := func(ctx context.Context) {
-		if w.doThis == nil && w.doThisOrThrowError == nil {
-			w.logger.Errorf("%s: no function set to execute", w.name)
+		if len(w.doThis) == 0 && len(w.doThisOrThrowError) == 0 {
+			w.logger.Errorf("%s: no function set to execute\n", w.name)
 			processError(ctx, ErrNoFunctionSet)
 		}
 
-		if w.doThis != nil {
-			w.doThis(ctx)
+		for _, do := range w.doThis {
+			do(ctx)
 		}
 
-		if w.doThisOrThrowError != nil {
-			if err := w.doThisOrThrowError(ctx); err != nil {
-				w.logger.Errorf("%s: error executing function: %v", w.name, err)
+		for _, do := range w.doThisOrThrowError {
+			if err := do(ctx); err != nil {
+				w.logger.Errorf("%s: error executing function: %v\n", w.name, err)
 				processError(ctx, err)
 			}
 		}
 	}
 
 	go func() {
-		w.logger.Printf(w.name + " started")
-		defer w.logger.Printf(w.name + " stopped")
+		w.logger.Printf(w.name + " started\n")
+		defer w.logger.Printf(w.name + " stopped\n")
 		defer wg.Done()
 		defer ticker.Stop()
 

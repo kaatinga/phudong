@@ -2,31 +2,52 @@ package phudong
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"time"
-
-	"github.com/kaatinga/qlog"
 )
+
+type Logger interface {
+	Printf(format string, args ...interface{})
+	Errorf(format string, args ...interface{})
+}
+
+type stdLogger struct {
+	output *os.File
+}
+
+func NewStdLogger() *stdLogger {
+	return &stdLogger{output: os.Stdout}
+}
+
+func (l *stdLogger) Printf(format string, args ...interface{}) {
+	fmt.Fprintf(l.output, format, args...)
+}
+
+func (l *stdLogger) Errorf(format string, args ...interface{}) {
+	fmt.Fprintf(os.Stderr, "ERROR: "+format, args...)
+}
 
 type optionFunc func(*options)
 
 type options struct {
-	// Add any fields that you want to configure for the worker
-	name               string
-	instantRun         bool
-	duration           time.Duration
-	doThis             func(ctx context.Context)
-	doThisOrThrowError func(ctx context.Context) error
+	name       string
+	instantRun bool
+	duration   time.Duration
+
+	doThis             []func(ctx context.Context)
+	doThisOrThrowError []func(ctx context.Context) error
 
 	withErrorProcessor func(ctx context.Context, err error)
 
-	logger qlog.Logger
+	logger Logger
 }
 
 func newOptions(opts ...optionFunc) options {
 	optsObj := options{
 		name:     "noName worker",
 		duration: time.Hour,
-		logger:   qlog.New(),
+		logger:   NewStdLogger(),
 	}
 
 	for _, opt := range opts {
@@ -37,9 +58,10 @@ func newOptions(opts ...optionFunc) options {
 }
 
 // WithLogger sets the logger for the worker.
-func WithLogger(logger qlog.Logger) optionFunc {
+func WithLogger(logger Logger) optionFunc {
 	return func(o *options) {
 		if logger == nil {
+			o.logger.Errorf("with logger: logger is nil\n")
 			return
 		}
 		o.logger = logger
@@ -49,6 +71,7 @@ func WithLogger(logger qlog.Logger) optionFunc {
 func WithName(name string) optionFunc {
 	return func(o *options) {
 		if name == "" {
+			o.logger.Errorf("with name: name is empty\n")
 			return
 		}
 
@@ -69,7 +92,7 @@ func WithDoThis(f func(ctx context.Context)) optionFunc {
 		if f == nil {
 			return
 		}
-		o.doThis = f
+		o.doThis = append(o.doThis, f)
 	}
 }
 
@@ -80,7 +103,7 @@ func WithDoThisOrThrowError(f func(ctx context.Context) error) optionFunc {
 			return
 		}
 
-		o.doThisOrThrowError = f
+		o.doThisOrThrowError = append(o.doThisOrThrowError, f)
 	}
 }
 
@@ -89,7 +112,8 @@ func WithDuration(d time.Duration) optionFunc {
 	return func(o *options) {
 		o.duration = d
 		if o.duration <= 0 {
-			o.duration = time.Hour // Default to 1 hour if not set or invalid
+			o.logger.Errorf("with duration: duration value is less than 0, setting to 1 hour\n")
+			o.duration = time.Hour
 		}
 	}
 }
@@ -98,6 +122,7 @@ func WithDuration(d time.Duration) optionFunc {
 func WithErrorProcessor(f func(ctx context.Context, err error)) optionFunc {
 	return func(o *options) {
 		if f == nil {
+			o.logger.Errorf("with error processor: error processor is nil\n")
 			return
 		}
 		o.withErrorProcessor = f
