@@ -19,7 +19,9 @@ func TestStdLoggerPrintf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(tmpfile.Name())
+	defer func() {
+		_ = os.Remove(tmpfile.Name())
+	}()
 
 	logger := &stdLogger{output: tmpfile}
 	logger.Printf("test message %d\n", 42)
@@ -48,12 +50,12 @@ func TestStdLoggerErrorf(t *testing.T) {
 	logger := &stdLogger{}
 	logger.Errorf("error message %d\n", 42)
 
-	w.Close()
+	_ = w.Close()
 	os.Stderr = oldStderr
 
 	// Read the content
 	var buf bytes.Buffer
-	buf.ReadFrom(r)
+	_, _ = buf.ReadFrom(r)
 	content := buf.String()
 
 	expected := "ERROR: error message 42\n"

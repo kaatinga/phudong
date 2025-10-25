@@ -21,7 +21,7 @@ func NewStdLogger() *stdLogger {
 }
 
 func (l *stdLogger) Printf(format string, args ...interface{}) {
-	fmt.Fprintf(l.output, format, args...)
+	_, _ = fmt.Fprintf(l.output, format, args...)
 }
 
 func (l *stdLogger) Errorf(format string, args ...interface{}) {
