@@ -8,24 +8,22 @@ import (
 )
 
 type Logger interface {
-	Printf(format string, args ...interface{})
-	Errorf(format string, args ...interface{})
+	Printf(format string, args ...any)
+	Errorf(format string, args ...any)
 }
 
-type stdLogger struct {
-	output *os.File
-}
+type stdLogger struct{}
 
 func NewStdLogger() *stdLogger {
-	return &stdLogger{output: os.Stdout}
+	return &stdLogger{}
 }
 
-func (l *stdLogger) Printf(format string, args ...interface{}) {
-	_, _ = fmt.Fprintf(l.output, format, args...)
+func (l *stdLogger) Printf(format string, args ...any) {
+	_, _ = fmt.Fprintf(os.Stdout, format, args...)
 }
 
-func (l *stdLogger) Errorf(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, "ERROR: "+format, args...)
+func (l *stdLogger) Errorf(format string, args ...any) {
+	_, _ = fmt.Fprintf(os.Stderr, "ERROR: "+format, args...)
 }
 
 type optionFunc func(*options)
