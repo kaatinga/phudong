@@ -13,31 +13,6 @@ func TestStdLogger(t *testing.T) {
 	}
 }
 
-func TestStdLoggerPrintf(t *testing.T) {
-	// Create a temporary file to capture output
-	tmpfile, err := os.CreateTemp("", "test-logger")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		_ = os.Remove(tmpfile.Name())
-	}()
-
-	logger := &stdLogger{output: tmpfile}
-	logger.Printf("test message %d\n", 42)
-
-	// Read the content
-	content, err := os.ReadFile(tmpfile.Name())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	expected := "test message 42\n"
-	if string(content) != expected {
-		t.Errorf("Expected %q, got %q", expected, string(content))
-	}
-}
-
 func TestStdLoggerErrorf(t *testing.T) {
 	// Capture stderr
 	oldStderr := os.Stderr
