@@ -3,6 +3,7 @@ package phudong
 import (
 	"context"
 	"errors"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -12,6 +13,35 @@ func TestNewWorker(t *testing.T) {
 	worker := NewWorker()
 	if worker == nil {
 		t.Fatal("NewWorker() returned nil")
+	}
+}
+
+type lifecycleLogger struct {
+	formats []string
+}
+
+func (l *lifecycleLogger) Printf(format string, args ...any) {
+	l.formats = append(l.formats, format)
+}
+
+func (l *lifecycleLogger) Errorf(format string, args ...any) {}
+
+func TestWorkerLifecycleLogFormats(t *testing.T) {
+	logger := &lifecycleLogger{}
+	worker := NewWorker(
+		WithLogger(logger),
+		WithDuration(time.Hour),
+	)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	worker.Start(ctx)
+	worker.Wait()
+
+	expected := []string{"noName worker started", "noName worker stopped"}
+	if !reflect.DeepEqual(logger.formats, expected) {
+		t.Errorf("Expected lifecycle log formats %q, got %q", expected, logger.formats)
 	}
 }
 
