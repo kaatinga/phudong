@@ -167,7 +167,32 @@ func TestDefaultOptions(t *testing.T) {
 	if opts.instantRun {
 		t.Error("Instant run should be false by default")
 	}
+	if opts.dailyAt {
+		t.Error("Daily at should be false by default")
+	}
 	if opts.logger == nil {
 		t.Error("Logger should not be nil")
+	}
+}
+
+func TestWithDailyAt(t *testing.T) {
+	opts := newOptions(WithDailyAt(1, 30))
+	if !opts.dailyAt {
+		t.Error("Daily at should be true")
+	}
+	if opts.dailyHour != 1 || opts.dailyMinute != 30 {
+		t.Errorf("Expected 1:30, got %d:%02d", opts.dailyHour, opts.dailyMinute)
+	}
+}
+
+func TestWithDailyAtInvalid(t *testing.T) {
+	opts := newOptions(WithDailyAt(24, 0))
+	if opts.dailyAt {
+		t.Error("Invalid hour should not enable daily at")
+	}
+
+	opts = newOptions(WithDailyAt(1, 60))
+	if opts.dailyAt {
+		t.Error("Invalid minute should not enable daily at")
 	}
 }

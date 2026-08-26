@@ -24,12 +24,17 @@ func (w *Worker) Wait() {
 	}
 }
 
+func (w *Worker) currentTime() time.Time {
+	if w.now != nil {
+		return w.now()
+	}
+	return time.Now()
+}
+
 func (w *Worker) Start(ctx context.Context) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	w.waitFunc = wg.Wait
-
-	ticker := time.NewTicker(w.duration)
 
 	processError := func(ctx context.Context, err error) {
 		if w.withErrorProcessor != nil {
@@ -59,11 +64,18 @@ func (w *Worker) Start(ctx context.Context) {
 		w.logger.Printf(w.name + " started")
 		defer w.logger.Printf(w.name + " stopped")
 		defer wg.Done()
-		defer ticker.Stop()
 
 		if w.instantRun {
 			doThisWrapper(ctx)
 		}
+
+		if w.dailyAt {
+			w.runDaily(ctx, doThisWrapper)
+			return
+		}
+
+		ticker := time.NewTicker(w.duration)
+		defer ticker.Stop()
 
 		for {
 			select {
@@ -74,4 +86,36 @@ func (w *Worker) Start(ctx context.Context) {
 			}
 		}
 	}()
+}
+
+func (w *Worker) runDaily(ctx context.Context, do func(context.Context)) {
+	for {
+		now := w.currentTime()
+		delay := max(nextDailyAt(now, w.dailyHour, w.dailyMinute).Sub(now), 0)
+
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			if !timer.Stop() {
+				select {
+				case <-timer.C:
+				default:
+				}
+			}
+			return
+		case <-timer.C:
+			do(ctx)
+		}
+	}
+}
+
+// nextDailyAt returns the next UTC occurrence of hour:minute.
+// If that time has already been reached today, the result is tomorrow.
+func nextDailyAt(now time.Time, hour, minute byte) time.Time {
+	now = now.UTC()
+	next := time.Date(now.Year(), now.Month(), now.Day(), int(hour), int(minute), 0, 0, time.UTC)
+	if !next.After(now) {
+		next = next.AddDate(0, 0, 1)
+	}
+	return next
 }

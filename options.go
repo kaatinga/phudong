@@ -33,12 +33,17 @@ type options struct {
 	instantRun bool
 	duration   time.Duration
 
+	dailyAt     bool
+	dailyHour   byte
+	dailyMinute byte
+
 	doThis             []func(ctx context.Context)
 	doThisOrThrowError []func(ctx context.Context) error
 
 	withErrorProcessor func(ctx context.Context, err error)
 
 	logger Logger
+	now    func() time.Time
 }
 
 func newOptions(opts ...optionFunc) options {
@@ -106,6 +111,7 @@ func WithDoThisOrThrowError(f func(ctx context.Context) error) optionFunc {
 }
 
 // WithDuration sets the duration for how often the worker should run.
+// Ignored when WithDailyAt is set.
 func WithDuration(d time.Duration) optionFunc {
 	return func(o *options) {
 		o.duration = d
@@ -113,6 +119,22 @@ func WithDuration(d time.Duration) optionFunc {
 			o.logger.Errorf("with duration: duration value is less than 0, setting to 1 hour\n")
 			o.duration = time.Hour
 		}
+	}
+}
+
+// WithDailyAt runs the worker once a day at hour:minute UTC.
+// hour must be 0–23 and minute 0–59. The next run is recomputed after
+// each execution so it stays on that UTC clock. WithDuration is ignored
+// in this mode.
+func WithDailyAt(hour, minute byte) optionFunc {
+	return func(o *options) {
+		if hour > 23 || minute > 59 {
+			o.logger.Errorf("with daily at: hour must be 0-23 and minute 0-59, got %d:%02d\n", hour, minute)
+			return
+		}
+		o.dailyAt = true
+		o.dailyHour = hour
+		o.dailyMinute = minute
 	}
 }
 

@@ -113,6 +113,7 @@ worker := phudong.NewWorker(
 |--------|-------------|---------|
 | `WithName(name string)` | Set the worker's name for logging | `"noName worker"` |
 | `WithDuration(d time.Duration)` | Set execution interval | `1 hour` |
+| `WithDailyAt(hour, minute byte)` | Run once a day at `hour:minute` UTC (`WithDuration` is ignored) | off |
 | `WithInstantRun(enabled bool)` | Run immediately on start | `false` |
 | `WithDoThis(func(ctx context.Context))` | Add a function to execute | - |
 | `WithDoThisOrThrowError(func(ctx context.Context) error)` | Add a function that may return an error | - |
@@ -169,8 +170,7 @@ worker := phudong.NewWorker(
 func startCleanupWorker(db *sql.DB) {
 	worker := phudong.NewWorker(
 		phudong.WithName("db-cleanup"),
-		phudong.WithDuration(24*time.Hour),
-		phudong.WithInstantRun(true),
+		phudong.WithDailyAt(1, 0), // 01:00 UTC, not on process start
 		phudong.WithDoThisOrThrowError(func(ctx context.Context) error {
 			// Clean up old records
 			_, err := db.ExecContext(ctx, "DELETE FROM logs WHERE created_at < ?", 
